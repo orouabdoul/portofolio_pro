@@ -1,348 +1,262 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    
     <title>Admin - Portfolio</title>
-    
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Styles -->
+    <!-- Custom Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    
     @stack('styles')
-    
     <style>
-        <div class="min-h-screen flex">
-            <!-- Sidebar minimal -->
-            <aside class="w-64 bg-gray-900 text-white flex flex-col p-4">
-                <h2 class="text-xl font-bold mb-6">Admin</h2>
-                <nav class="flex-1 space-y-2">
-                    <a href="{{ route('admin.dashboard') }}" class="block py-2 px-3 rounded hover:bg-gray-800">Dashboard</a>
-                    <a href="{{ route('admin.messages') }}" class="block py-2 px-3 rounded hover:bg-gray-800">Messages</a>
-                    <a href="{{ route('admin.projects') }}" class="block py-2 px-3 rounded hover:bg-gray-800">Projets</a>
-                    <a href="{{ route('admin.settings') }}" class="block py-2 px-3 rounded hover:bg-gray-800">Paramètres</a>
-                    <a href="{{ route('portfolio') }}" class="block py-2 px-3 rounded hover:bg-gray-800">Voir le site</a>
-                </nav>
-                <form action="{{ route('admin.logout') }}" method="POST" class="mt-6">
-                    @csrf
-                    <button type="submit" class="w-full py-2 px-3 rounded bg-red-600 hover:bg-red-700">Déconnexion</button>
-                </form>
-            </aside>
-            <!-- Main content -->
-            <main class="flex-1 p-8 bg-gray-50">
-                @yield('content')
-            </main>
-        </div>
-            .mobile-title {
-                font-size: 1.2rem;
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 50%, #ede9fe 100%);
+            overflow: hidden !important;
+        }
+        main {
+            height: 100vh;
+            overflow-y: auto;
+        }
+        .sidebar {
+            background: linear-gradient(180deg, #312e81 0%, #6366f1 100%);
+            color: #fff;
+            min-height: 100vh;
+            box-shadow: 0 0 40px 0 rgba(49,46,129,0.15);
+        }
+        .sidebar .nav-link.active {
+            background: linear-gradient(90deg, #6366f1 0%, #a78bfa 100%);
+            color: #fff;
+            font-weight: 600;
+        }
+        .sidebar .nav-link {
+            color: #e0e7ff;
+            border-radius: 0.75rem;
+            margin-bottom: 0.5rem;
+            transition: background 0.2s, color 0.2s;
+        }
+        .sidebar .nav-link:hover {
+            background: #4338ca;
+            color: #fff;
+        }
+        .sidebar .user-section {
+            background: rgba(49,46,129,0.7);
+            border-radius: 1rem;
+            padding: 1rem;
+            margin-top: 2rem;
+        }
+        .sidebar .user-avatar {
+            background: linear-gradient(90deg, #a78bfa 0%, #6366f1 100%);
+            color: #fff;
+            font-weight: bold;
+            border-radius: 0.75rem;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+        @media (max-width: 991.98px) {
+            .sidebar {
+                position: fixed;
+                left: 0;
+                top: 0;
+                width: 260px;
+                z-index: 1050;
+                transform: translateX(-100%);
+                transition: transform 0.3s cubic-bezier(.4,0,.2,1);
             }
-            
-            .mobile-subtitle {
-                font-size: 0.8rem;
+            .sidebar.show {
+                transform: translateX(0);
             }
+            .sidebar-overlay {
+                display: block;
+                position: fixed;
+                inset: 0;
+                background: rgba(0,0,0,0.4);
+                z-index: 1040;
+            }
+        }
+        @media (min-width: 992px) {
+            .sidebar {
+                position: relative;
+                transform: none !important;
+                width: 260px;
+            }
+            .sidebar-overlay {
+                display: none !important;
+            }
+        }
+        .sidebar-overlay {
+            display: none;
+        }
+        .sticky-top {
+            top: 0;
+            z-index: 1030;
         }
     </style>
 </head>
-<body class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 min-h-screen">
-    
-    <!-- Mobile Overlay -->
-    <div id="sidebar-overlay" class="sidebar-overlay fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm lg:hidden"></div>
-    
-    <div class="flex h-screen relative">
-        <!-- Mobile/Desktop Sidebar -->
-        <aside id="sidebar" class="sidebar fixed lg:relative top-0 left-0 w-72 h-full bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white shadow-2xl">
-            <!-- Sidebar Header -->
-            <div class="p-6 border-b border-gray-700/50 bg-gradient-to-r from-purple-900/50 to-blue-900/50">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h2 class="text-2xl font-bold bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
-                            Admin Portfolio
-                        </h2>
-                        <p class="text-xs text-gray-400 mt-1">Panel d'administration</p>
-                    </div>
-                    <button id="close-sidebar" class="lg:hidden text-gray-400 hover:text-white transition-colors">
-                        <i class="fas fa-times text-xl"></i>
+<body>
+    <!-- Sidebar Overlay (mobile) -->
+    <div id="sidebarOverlay" class="sidebar-overlay"></div>
+    <div class="container-fluid p-0">
+        <div class="row g-0">
+            <!-- Sidebar -->
+            <nav id="sidebar" class="sidebar col-lg-3 col-xl-2 d-lg-block p-4">
+                <div class="d-flex align-items-center justify-content-between mb-4">
+                    <h2 class="fw-bold fs-4 mb-0">Admin Portfolio</h2>
+                    <button id="closeSidebar" class="btn btn-link text-light d-lg-none fs-4" aria-label="Fermer le menu">
+                        <i class="fas fa-times"></i>
                     </button>
                 </div>
-            </div>
-            
-            <!-- Navigation -->
-            <nav class="mt-6 px-3">
-                <div class="space-y-2">
-                    <a href="{{ route('admin.dashboard') }}" 
-                       class="nav-item flex items-center px-4 py-3 rounded-xl text-gray-300 hover:text-white transition-all duration-300 {{ Request::routeIs('admin.dashboard') ? 'active text-white' : 'hover:bg-gray-700/50' }}">
-                        <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 mr-3 shadow-lg">
-                            <i class="fas fa-chart-bar text-sm"></i>
-                        </div>
-                        <span class="font-medium">Tableau de bord</span>
-                    </a>
-                    
-                    <a href="{{ route('admin.messages') }}" 
-                       class="nav-item flex items-center px-4 py-3 rounded-xl text-gray-300 hover:text-white transition-all duration-300 {{ Request::routeIs('admin.messages*') || Request::routeIs('admin.message*') ? 'active text-white' : 'hover:bg-gray-700/50' }}">
-                        <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-r from-green-500 to-emerald-600 mr-3 shadow-lg">
-                            <i class="fas fa-envelope text-sm"></i>
-                        </div>
-                        <span class="font-medium">Messages</span>
-                        @if(isset($unreadCount) && $unreadCount > 0)
-                            <span class="badge ml-auto bg-red-500 text-white rounded-full px-2 py-1 text-xs font-bold shadow-lg">{{ $unreadCount }}</span>
-                        @endif
-                    </a>
-                    
-                    <a href="{{ route('admin.projects') }}" 
-                       class="nav-item flex items-center px-4 py-3 rounded-xl text-gray-300 hover:text-white transition-all duration-300 {{ Request::routeIs('admin.projects*') ? 'active text-white' : 'hover:bg-gray-700/50' }}">
-                        <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-r from-yellow-500 to-orange-600 mr-3 shadow-lg">
-                            <i class="fas fa-folder-open text-sm"></i>
-                        </div>
-                        <span class="font-medium">Projets</span>
-                    </a>
-                    
-                    <a href="{{ route('admin.analytics') }}" 
-                       class="nav-item flex items-center px-4 py-3 rounded-xl text-gray-300 hover:text-white transition-all duration-300 {{ Request::routeIs('admin.analytics') ? 'active text-white' : 'hover:bg-gray-700/50' }}">
-                        <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-r from-pink-500 to-red-600 mr-3 shadow-lg">
-                            <i class="fas fa-chart-line text-sm"></i>
-                        </div>
-                        <span class="font-medium">Analytics</span>
-                    </a>
-                    
-                    <a href="{{ route('admin.settings') }}" 
-                       class="nav-item flex items-center px-4 py-3 rounded-xl text-gray-300 hover:text-white transition-all duration-300 {{ Request::routeIs('admin.settings') ? 'active text-white' : 'hover:bg-gray-700/50' }}">
-                        <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 mr-3 shadow-lg">
-                            <i class="fas fa-cog text-sm"></i>
-                        </div>
-                        <span class="font-medium">Paramètres</span>
-                    </a>
-                    
-                    <a href="{{ route('admin.email-setup') }}" 
-                       class="nav-item flex items-center px-4 py-3 rounded-xl text-gray-300 hover:text-white transition-all duration-300 {{ Request::routeIs('admin.email-setup') ? 'active text-white' : 'hover:bg-gray-700/50' }}">
-                        <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 mr-3 shadow-lg">
-                            <i class="fas fa-envelope-open-text text-sm"></i>
-                        </div>
-                        <span class="font-medium">Config Email</span>
-                    </a>
-                </div>
-                
-                <!-- Separator -->
-                <div class="border-t border-gray-700/50 my-6"></div>
-                
-                <!-- Secondary Navigation -->
-                <div class="space-y-2">
-                    <a href="{{ route('portfolio') }}" 
-                       class="nav-item flex items-center px-4 py-3 rounded-xl text-gray-300 hover:text-white transition-all duration-300 hover:bg-gray-700/50">
-                        <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-r from-teal-500 to-green-600 mr-3 shadow-lg">
-                            <i class="fas fa-eye text-sm"></i>
-                        </div>
-                        <span class="font-medium">Voir le site</span>
-                    </a>
-                </div>
-            </nav>
-            
-            <!-- User Section -->
-            <div class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-gray-900 to-transparent">
-                <div class="bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 border border-gray-700/50">
-                    <div class="flex items-center mb-3">
-                        <div class="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center text-white font-bold shadow-lg">
-                            A
-                        </div>
-                        <div class="ml-3">
-                            <p class="text-white font-medium text-sm">Admin</p>
-                            <p class="text-gray-400 text-xs">Administrateur</p>
+                <ul class="nav flex-column mb-4">
+                    <li class="nav-item">
+                        <a href="{{ route('admin.dashboard') }}" class="nav-link {{ Request::routeIs('admin.dashboard') ? 'active' : '' }}">
+                            <i class="fas fa-chart-bar me-2"></i> Tableau de bord
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('admin.messages') }}" class="nav-link {{ Request::routeIs('admin.messages*') || Request::routeIs('admin.message*') ? 'active' : '' }}">
+                            <i class="fas fa-envelope me-2"></i> Messages
+                            @if(isset($unreadCount) && $unreadCount > 0)
+                                <span class="badge bg-danger ms-2">{{ $unreadCount }}</span>
+                            @endif
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('admin.projects') }}" class="nav-link {{ Request::routeIs('admin.projects*') ? 'active' : '' }}">
+                            <i class="fas fa-folder-open me-2"></i> Projets
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('admin.products') }}" class="nav-link {{ Request::routeIs('admin.products*') ? 'active' : '' }}">
+                            <i class="fas fa-box-open me-2"></i> Produits
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('admin.analytics') }}" class="nav-link {{ Request::routeIs('admin.analytics') ? 'active' : '' }}">
+                            <i class="fas fa-chart-line me-2"></i> Analytics
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('admin.settings') }}" class="nav-link {{ Request::routeIs('admin.settings') ? 'active' : '' }}">
+                            <i class="fas fa-cog me-2"></i> Paramètres
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('admin.email-setup') }}" class="nav-link {{ Request::routeIs('admin.email-setup') ? 'active' : '' }}">
+                            <i class="fas fa-envelope-open-text me-2"></i> Config Email
+                        </a>
+                    </li>
+                </ul>
+                <div class="border-top border-light my-3"></div>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a href="{{ route('portfolio') }}" class="nav-link">
+                            <i class="fas fa-eye me-2"></i> Voir le site
+                        </a>
+                    </li>
+                </ul>
+                <div class="user-section mt-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="user-avatar">A</div>
+                        <div class="ms-3">
+                            <div class="fw-medium">Admin</div>
+                            <div class="text-light small">Administrateur</div>
                         </div>
                     </div>
-                    
                     <form action="{{ route('admin.logout') }}" method="POST">
                         @csrf
-                        <button type="submit" class="w-full flex items-center justify-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors duration-300 text-sm font-medium shadow-lg">
-                            <i class="fas fa-sign-out-alt mr-2"></i>
-                            Déconnexion
+                        <button type="submit" class="btn btn-danger w-100">
+                            <i class="fas fa-sign-out-alt me-2"></i> Déconnexion
                         </button>
                     </form>
                 </div>
-            </div>
-        </aside>
-        
-        <!-- Main Content -->
-        <div class="flex-1 flex flex-col min-h-screen lg:ml-0">
-            <!-- Top Header -->
-            <header class="glass-effect shadow-lg border-b border-gray-200/50 sticky top-0 z-30">
-                <div class="flex items-center justify-between px-4 sm:px-6 py-4">
-                    <div class="flex items-center">
-                        <button id="mobile-menu-btn" class="mobile-menu-btn lg:hidden mr-4 p-2 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg hover:shadow-xl transition-all duration-300">
-                            <i class="fas fa-bars text-lg"></i>
+            </nav>
+            <!-- Main Content -->
+            <main class="col-lg-9 col-xl-10 ms-auto">
+                <!-- Header -->
+                <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top shadow-sm py-3 px-4">
+                    <div class="d-flex align-items-center">
+                        <button id="openSidebar" class="btn btn-primary d-lg-none me-3" aria-label="Ouvrir le menu">
+                            <i class="fas fa-bars"></i>
                         </button>
                         <div>
-                            <h1 class="mobile-title text-xl sm:text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
-                                @yield('title', 'Dashboard')
-                            </h1>
-                            <p class="mobile-subtitle text-xs sm:text-sm text-gray-600 mt-1">Panel d'administration</p>
+                            <span class="fs-5 fw-bold text-primary">@yield('title', 'Dashboard')</span>
+                            <span class="d-block text-muted small">Panel d'administration</span>
                         </div>
                     </div>
-                    
-                    <div class="flex items-center space-x-3 sm:space-x-4">
-                        <div class="hidden sm:block text-right">
-                            <div class="text-sm font-medium text-gray-900">{{ now()->format('d/m/Y') }}</div>
-                            <div class="text-xs text-gray-500">{{ now()->format('H:i') }}</div>
+                    <div class="ms-auto d-flex align-items-center">
+                        <div class="me-4 text-end d-none d-md-block">
+                            <div class="fw-medium">{{ now()->format('d/m/Y') }}</div>
+                            <div class="text-muted small">{{ now()->format('H:i') }}</div>
                         </div>
-                        <div class="w-10 h-10 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl flex items-center justify-center text-white font-bold shadow-lg">
-                            A
-                        </div>
+                        <div class="user-avatar">A</div>
                     </div>
+                </nav>
+                <div class="container-fluid py-4">
+                    @if(session('success'))
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endif
+                    @if(session('error'))
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-circle me-2"></i> {{ session('error') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endif
+                    @yield('content')
                 </div>
-            </header>
-            
-            <!-- Page Content -->
-            <main class="flex-1 p-4 sm:p-6 lg:p-8">
-                <!-- Flash Messages -->
-                @if(session('success'))
-                    <div class="glass-effect border border-green-200 text-green-800 px-6 py-4 rounded-xl mb-6 shadow-lg">
-                        <div class="flex items-center">
-                            <i class="fas fa-check-circle mr-3 text-green-600"></i>
-                            <span class="font-medium">{{ session('success') }}</span>
-                        </div>
-                    </div>
-                @endif
-                
-                @if(session('error'))
-                    <div class="glass-effect border border-red-200 text-red-800 px-6 py-4 rounded-xl mb-6 shadow-lg">
-                        <div class="flex items-center">
-                            <i class="fas fa-exclamation-circle mr-3 text-red-600"></i>
-                            <span class="font-medium">{{ session('error') }}</span>
-                        </div>
-                    </div>
-                @endif
-                
-                @yield('content')
             </main>
         </div>
     </div>
-
-    <!-- JavaScript for Mobile Menu -->
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Sidebar mobile logic
         document.addEventListener('DOMContentLoaded', function() {
-            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
             const sidebar = document.getElementById('sidebar');
-            const sidebarOverlay = document.getElementById('sidebar-overlay');
-            const closeSidebarBtn = document.getElementById('close-sidebar');
-            
-            // Open sidebar
-            mobileMenuBtn?.addEventListener('click', function() {
-                sidebar.classList.add('active');
-                sidebarOverlay.classList.add('active');
-                mobileMenuBtn.classList.add('active');
-                document.body.style.overflow = 'hidden'; // Prevent scroll
-            });
-            
-            // Close sidebar
-            function closeSidebar() {
-                sidebar.classList.remove('active');
-                sidebarOverlay.classList.remove('active');
-                mobileMenuBtn.classList.remove('active');
-                document.body.style.overflow = ''; // Restore scroll
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+            const openSidebarBtn = document.getElementById('openSidebar');
+            const closeSidebarBtn = document.getElementById('closeSidebar');
+            function openSidebar() {
+                sidebar.classList.add('show');
+                sidebarOverlay.style.display = 'block';
+                // Le body reste overflow: hidden
             }
-            
+            function closeSidebar() {
+                sidebar.classList.remove('show');
+                sidebarOverlay.style.display = 'none';
+                // Le body reste overflow: hidden
+            }
+            openSidebarBtn?.addEventListener('click', openSidebar);
             closeSidebarBtn?.addEventListener('click', closeSidebar);
             sidebarOverlay?.addEventListener('click', closeSidebar);
-            
             // Close sidebar when clicking a nav link on mobile
-            const navLinks = sidebar.querySelectorAll('a');
-            navLinks.forEach(link => {
+            sidebar.querySelectorAll('a').forEach(link => {
                 link.addEventListener('click', function() {
-                    if (window.innerWidth < 1024) {
+                    if (window.innerWidth < 992) {
                         setTimeout(closeSidebar, 100);
                     }
                 });
             });
-            
-            // Handle window resize
             window.addEventListener('resize', function() {
-                if (window.innerWidth >= 1024) {
-                    sidebar.classList.remove('active');
-                    sidebarOverlay.classList.remove('active');
-                    mobileMenuBtn.classList.remove('active');
-                    document.body.style.overflow = '';
+                if (window.innerWidth >= 992) {
+                    closeSidebar();
                 }
-            });
-            
-            // Auto-hide flash messages with enhanced animation
-            setTimeout(() => {
-                const alerts = document.querySelectorAll('.glass-effect');
-                alerts.forEach(alert => {
-                    if (alert.textContent.includes('succès') || alert.textContent.includes('erreur')) {
-                        alert.style.transition = 'all 0.5s ease-out';
-                        alert.style.transform = 'translateY(-10px)';
-                        alert.style.opacity = '0';
-                        setTimeout(() => alert.remove(), 500);
-                    }
-                });
-            }, 5000);
-            
-            // Add smooth animations to navigation items
-            const navItems = document.querySelectorAll('.nav-item');
-            navItems.forEach((item, index) => {
-                item.style.animationDelay = `${index * 0.1}s`;
-                item.addEventListener('mouseenter', function() {
-                    this.style.transform = 'translateX(5px)';
-                });
-                item.addEventListener('mouseleave', function() {
-                    this.style.transform = 'translateX(0)';
-                });
-            });
-            
-            // Enhanced visual feedback for interactions
-            const interactiveElements = document.querySelectorAll('button, a, .nav-item');
-            interactiveElements.forEach(element => {
-                element.addEventListener('click', function(e) {
-                    // Create ripple effect
-                    const ripple = document.createElement('span');
-                    const rect = this.getBoundingClientRect();
-                    const size = Math.max(rect.width, rect.height);
-                    const x = e.clientX - rect.left - size / 2;
-                    const y = e.clientY - rect.top - size / 2;
-                    
-                    ripple.style.width = ripple.style.height = size + 'px';
-                    ripple.style.left = x + 'px';
-                    ripple.style.top = y + 'px';
-                    ripple.className = 'ripple';
-                    
-                    this.style.position = 'relative';
-                    this.style.overflow = 'hidden';
-                    this.appendChild(ripple);
-                    
-                    setTimeout(() => {
-                        ripple.remove();
-                    }, 600);
-                });
             });
         });
-        
-        // Add CSS for ripple effect
-        const style = document.createElement('style');
-        style.textContent = `
-            .ripple {
-                position: absolute;
-                border-radius: 50%;
-                background: rgba(255, 255, 255, 0.3);
-                transform: scale(0);
-                animation: ripple-animation 0.6s ease-out;
-                pointer-events: none;
-            }
-            
-            @keyframes ripple-animation {
-                to {
-                    transform: scale(2);
-                    opacity: 0;
-                }
-            }
-        `;
-        document.head.appendChild(style);
     </script>
-    
     @stack('scripts')
 </body>
 </html>
+              

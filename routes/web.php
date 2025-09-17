@@ -1,6 +1,9 @@
+ 
 
 
 <?php
+use App\Http\Controllers\Admin\ProjectController;
+use App\Http\Controllers\Admin\MessageExportController;
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -29,34 +32,52 @@ Route::post('/admin/login', function (Request $request) {
         'password' => 'required',
     ]);
     $admin = DB::table('admins')->where('email', $request->email)->first();
-    if ($admin && Hash::check($request->password, $admin->password)) {
-        Session::put('is_admin', true);
-        return redirect('/admin/contacts');
+    if ($admin) {
+        if (Hash::check($request->password, $admin->password)) {
+            Session::put('is_admin', true);
+            return redirect('/admin/dashboard');
+        } else {
+            return back()->with('error', 'Mot de passe incorrect');
+        }
+    } else {
+        return back()->with('error', 'Email inconnu');
     }
-    return back()->with('error', 'Identifiants invalides');
 });
 
 
 // Protection admin via closure middleware dans le groupe
 Route::group(['prefix' => 'admin', 'middleware' => function ($request, $next) {
+    // ...middleware uniquement...
     if (!Session::get('is_admin')) {
         return redirect()->route('admin.login');
     }
     return $next($request);
 }], function () {
+    // Export PDF/Excel des messages
+    Route::get('/messages/export/{format}', [MessageExportController::class, 'export'])->name('admin.messages.export');
     // Dashboard
-    Route::get('/dashboard', function () {
-        return view('admin.dashboard');
-    })->name('admin.dashboard');
+        Route::get('/dashboard', function () {
+        $messages = \App\Models\Message::all();
+        $projects = \App\Models\Project::all();
+        $products = \App\Models\Product::all();
+        return view('admin.dashboard', compact('messages', 'projects', 'products'));
+        })->name('admin.dashboard');
 
     // Messages/Contacts
-    Route::view('/contacts', 'admin.contacts')->name('admin.messages');
+        Route::get('/contacts', function () {
+            $messages = \App\Models\Message::paginate(10);
+            $contacts = \App\Models\Contact::all();
+            return view('admin.messages', compact('messages', 'contacts'));
+        })->name('admin.messages');
 
     // Projets
-    Route::view('/projects', 'admin.projects')->name('admin.projects');
+    Route::get('/projects', [ProjectController::class, 'index'])->name('admin.projects');
 
     // Produits
-    Route::view('/products', 'admin.products')->name('admin.products');
+    Route::get('/products', function () {
+        $products = \App\Models\Product::all();
+        return view('admin.products', compact('products'));
+    })->name('admin.products');
 
     // Analytics
     Route::view('/analytics', 'admin.analytics')->name('admin.analytics');

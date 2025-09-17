@@ -1,7 +1,13 @@
 <section class="py-5" id="projects" style="background:#1E192D;">
     <div class="container">
-    <div class="text-center mb-5">
+    <div class="text-center mb-4">
         <h2 class="fw-bold text-white" style="font-size:2.2rem;">Nos <span class="text-info">Projects</span></h2>
+    </div>
+    <div class="d-flex justify-content-center gap-2 mb-5 flex-wrap">
+        <button class="btn btn-primary px-4 fw-bold shadow-sm rounded-pill active">Tous</button>
+        <button class="btn btn-outline-info px-4 fw-bold shadow-sm rounded-pill">Design UI/UX</button>
+        <button class="btn btn-outline-success px-4 fw-bold shadow-sm rounded-pill">App Mobile</button>
+        <button class="btn btn-outline-warning px-4 fw-bold shadow-sm rounded-pill">Produits</button>
     </div>
     <div class="row g-4 justify-content-center">
         <div class="col-12 col-md-6 col-lg-4">

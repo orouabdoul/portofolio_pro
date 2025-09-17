@@ -50,7 +50,7 @@
 @endpush
 
 @section('content')
-<div class="space-y-6">
+<div class="container-fluid py-4">
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
         <div>
             <h2 class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-1">Gestion des produits</h2>
@@ -61,26 +61,57 @@
         </button>
     </div>
 
-    <div class="overflow-x-auto">
-        <table class="product-table min-w-full rounded-xl overflow-hidden shadow-lg">
-            <thead>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-primary">
                 <tr>
-                    <th class="px-6 py-3 text-left text-sm font-semibold">Nom</th>
-                    <th class="px-6 py-3 text-left text-sm font-semibold">Description</th>
-                    <th class="px-6 py-3 text-left text-sm font-semibold">Prix</th>
-                    <th class="px-6 py-3 text-center text-sm font-semibold">Action</th>
+                    <th>Produit</th>
+                    <th>Catégorie</th>
+                    <th>Prix</th>
+                    <th>Statut</th>
+                    <th class="text-center">Actions</th>
                 </tr>
             </thead>
             <tbody>
+                @forelse($products as $product)
                 <tr>
-                    <td class="px-6 py-4 font-medium text-gray-900">Produit exemple</td>
-                    <td class="px-6 py-4 text-gray-700">Accessoire mobile</td>
-                    <td class="px-6 py-4 text-blue-700 font-semibold">29,99 €</td>
-                    <td class="px-6 py-4 text-center">
-                        <button class="btn btn-edit btn-sm rounded-lg px-3 py-1 mr-2"><i class="fas fa-edit mr-1"></i>Éditer</button>
-                        <button class="btn btn-delete btn-sm rounded-lg px-3 py-1"><i class="fas fa-trash-alt mr-1"></i>Supprimer</button>
+                    <td>
+                        <div class="d-flex align-items-center gap-3">
+                            <img src="{{ $product->image_path ? asset($product->image_path) : 'https://via.placeholder.com/64x64/6366f1/a78bfa?text=Produit' }}" class="rounded shadow" alt="{{ $product->title }}" width="48" height="48">
+                            <div>
+                                <div class="fw-bold text-primary">{{ $product->title }}</div>
+                                <div class="text-muted small">{{ $product->short_description }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td><span class="badge bg-info text-dark">{{ ucfirst($product->category) }}</span></td>
+                    <td>{{ $product->price }} €</td>
+                    <td>
+                        @if($product->is_active)
+                            <span class="badge bg-success">Actif</span>
+                        @else
+                            <span class="badge bg-danger">Inactif</span>
+                        @endif
+                    </td>
+                    <td class="text-center">
+                        <a href="{{ route('admin.products.show', $product) }}" class="btn btn-sm btn-outline-primary me-1" title="Voir"><i class="fas fa-eye"></i></a>
+                        <a href="{{ route('admin.products.edit', $product) }}" class="btn btn-sm btn-outline-info me-1" title="Modifier"><i class="fas fa-edit"></i></a>
+                        <form action="{{ route('admin.products.delete', $product) }}" method="POST" class="d-inline" onsubmit="return confirm('Supprimer ce produit ?')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Supprimer"><i class="fas fa-trash"></i></button>
+                        </form>
                     </td>
                 </tr>
+                @empty
+                <tr>
+                    <td colspan="5" class="text-center py-5 text-muted">
+                        <i class="fas fa-box-open fa-2x mb-2"></i><br>
+                        Aucun produit trouvé.<br>
+                        <a href="#" class="btn btn-primary mt-3"><i class="fas fa-plus me-2"></i>Créer un produit</a>
+                    </td>
+                </tr>
+                @endforelse
             </tbody>
         </table>
     </div>
