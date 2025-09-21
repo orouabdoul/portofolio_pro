@@ -1,7 +1,6 @@
- 
-
-
 <?php
+use App\Http\Controllers\Admin\MessageController;
+// Route pour le formulaire de contact public
 use App\Http\Controllers\Admin\ProjectController;
 use App\Http\Controllers\Admin\MessageExportController;
 
@@ -21,28 +20,11 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Http\Request;
 
 // Afficher le formulaire de login admin
-Route::get('/admin/login', function () {
-    return view('admin.login');
-})->name('admin.login');
+use App\Http\Controllers\Admin\AdminAuthController;
+Route::get('/admin/login', [AdminAuthController::class, 'showLoginForm'])->name('admin.login');
 
 // Traiter la connexion admin (email/password)
-Route::post('/admin/login', function (Request $request) {
-    $request->validate([
-        'email' => 'required|email',
-        'password' => 'required',
-    ]);
-    $admin = DB::table('admins')->where('email', $request->email)->first();
-    if ($admin) {
-        if (Hash::check($request->password, $admin->password)) {
-            Session::put('is_admin', true);
-            return redirect('/admin/dashboard');
-        } else {
-            return back()->with('error', 'Mot de passe incorrect');
-        }
-    } else {
-        return back()->with('error', 'Email inconnu');
-    }
-});
+Route::post('/admin/login', [AdminAuthController::class, 'login'])->name('admin.login.submit');
 
 
 // Protection admin via closure middleware dans le groupe
@@ -57,27 +39,36 @@ Route::group(['prefix' => 'admin', 'middleware' => function ($request, $next) {
     Route::get('/messages/export/{format}', [MessageExportController::class, 'export'])->name('admin.messages.export');
     // Dashboard
         Route::get('/dashboard', function () {
-        $messages = \App\Models\Message::all();
+    $messages = \App\Models\Contact::all();
         $projects = \App\Models\Project::all();
         $products = \App\Models\Product::all();
         return view('admin.dashboard', compact('messages', 'projects', 'products'));
         })->name('admin.dashboard');
 
-    // Messages/Contacts
-        Route::get('/contacts', function () {
-            $messages = \App\Models\Message::paginate(10);
-            $contacts = \App\Models\Contact::all();
-            return view('admin.messages', compact('messages', 'contacts'));
-        })->name('admin.messages');
+    // Messages
+    Route::get('/messages', [\App\Http\Controllers\Admin\MessageController::class, 'index'])->name('admin.messages');
+    Route::post('/contact', [\App\Http\Controllers\Admin\MessageController::class, 'store'])->name('contact.submit');
+    Route::get('/messages/{id}', [\App\Http\Controllers\Admin\MessageController::class, 'show'])->name('admin.messages.show');
+    Route::delete('/messages/{id}', [\App\Http\Controllers\Admin\MessageController::class, 'destroy'])->name('admin.messages.destroy');
 
     // Projets
     Route::get('/projects', [ProjectController::class, 'index'])->name('admin.projects');
+    Route::get('/projects/create', [ProjectController::class, 'create'])->name('admin.projects.create');
+    Route::post('/projects', [ProjectController::class, 'store'])->name('admin.projects.store');
+    Route::get('/projects/{id}/edit', [ProjectController::class, 'edit'])->name('admin.projects.edit');
+    Route::put('/projects/{id}', [ProjectController::class, 'update'])->name('admin.projects.update');
+    Route::delete('/projects/{id}', [ProjectController::class, 'destroy'])->name('admin.projects.destroy');
+    Route::get('/projects/{id}', [ProjectController::class, 'show'])->name('admin.projects.show');
+    Route::patch('/projects/{project}/toggle', [ProjectController::class, 'toggle'])->name('admin.projects.toggle');
 
     // Produits
-    Route::get('/products', function () {
-        $products = \App\Models\Product::all();
-        return view('admin.products', compact('products'));
-    })->name('admin.products');
+    Route::get('/products', [\App\Http\Controllers\Admin\ProductController::class, 'index'])->name('admin.products');
+    Route::get('/products/create', [\App\Http\Controllers\Admin\ProductController::class, 'create'])->name('admin.products.create');
+    Route::post('/products', [\App\Http\Controllers\Admin\ProductController::class, 'store'])->name('admin.products.store');
+    Route::get('/products/{id}/edit', [\App\Http\Controllers\Admin\ProductController::class, 'edit'])->name('admin.products.edit');
+    Route::put('/products/{id}', [\App\Http\Controllers\Admin\ProductController::class, 'update'])->name('admin.products.update');
+    Route::delete('/products/{id}', [\App\Http\Controllers\Admin\ProductController::class, 'destroy'])->name('admin.products.destroy');
+    Route::get('/products/{id}', [\App\Http\Controllers\Admin\ProductController::class, 'show'])->name('admin.products.show');
 
     // Analytics
     Route::view('/analytics', 'admin.analytics')->name('admin.analytics');
@@ -89,27 +80,17 @@ Route::group(['prefix' => 'admin', 'middleware' => function ($request, $next) {
     Route::view('/email-setup', 'admin.email-setup')->name('admin.email-setup');
 
     // Détail d'un message (dashboard et contacts)
-    Route::get('/messages/{id}', function ($id) {
-        return view('admin.message-show');
-    })->name('admin.message.show');
 
     // Actions fictives pour éviter erreurs dans la vue message-show
     Route::post('/messages/{id}/read', function ($id) {
         return back()->with('success', 'Message marqué comme lu (simulation)');
     })->name('admin.messages.read');
-    Route::delete('/messages/{id}', function ($id) {
-        return redirect()->route('admin.messages')->with('success', 'Message supprimé (simulation)');
-    })->name('admin.messages.delete');
-    Route::post('/messages/{id}/reply', function ($id) {
-        return back()->with('success', 'Réponse envoyée (simulation)');
-    })->name('admin.messages.reply');
+    Route::post('/messages/{id}/reply', [\App\Http\Controllers\Admin\MessageController::class, 'reply'])->name('admin.messages.reply');
 
     // Déconnexion
-    Route::post('/logout', function () {
-        Session::forget('is_admin');
-        return redirect()->route('admin.login');
-    })->name('admin.logout');
+    Route::post('/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
 });
 
 // Lien portfolio public
 Route::get('/portfolio', function () { return redirect('/'); })->name('portfolio');
+Route::delete('/admin/projects/{project}', [\App\Http\Controllers\Admin\ProjectController::class, 'destroy'])->name('admin.projects.delete');

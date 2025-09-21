@@ -1,4 +1,3 @@
-
 @extends('admin.layout')
 
 @section('title', 'Gestion des Projets')
@@ -13,8 +12,7 @@
                 <p class="text-light mb-0">Gérez vos projets portfolio : créez, modifiez et organisez vos réalisations.</p>
             </div>
             <div class="d-flex gap-2">
-                <a href="#" class="btn btn-light text-primary fw-bold shadow-sm"><i class="fas fa-plus me-2"></i>Nouveau Projet</a>
-                <a href="#" class="btn btn-outline-light fw-bold shadow-sm"><i class="fas fa-magic me-2"></i>Assistant Création</a>
+                <a href="{{ route('admin.projects.create') }}" class="btn btn-light text-primary fw-bold shadow-sm"><i class="fas fa-plus me-2"></i>Nouveau Projet</a>
             </div>
         </div>
     </div>
@@ -80,7 +78,13 @@
                         <tr>
                             <td>
                                 <div class="d-flex align-items-center gap-3">
-                                    <img src="{{ $project->image_path ? asset($project->image_path) : 'https://via.placeholder.com/64x64/6366f1/a78bfa?text=Projet' }}" class="rounded shadow" alt="{{ $project->title }}" width="48" height="48">
+                                    @php
+                                        $imageFullPath = public_path('storage/' . $project->image_path);
+                                        $imageUrl = ($project->image_path && file_exists($imageFullPath))
+                                            ? asset('storage/' . $project->image_path)
+                                            : 'https://via.placeholder.com/64x64/6366f1/a78bfa?text=Projet';
+                                    @endphp
+                                    <img src="{{ $imageUrl }}" class="rounded shadow" alt="{{ $project->title }}" width="80" height="80" style="object-fit:cover;aspect-ratio:1/1;">
                                     <div>
                                         <div class="fw-bold text-primary">{{ $project->title }}</div>
                                         <div class="text-muted small">{{ $project->short_description }}</div>
@@ -89,9 +93,13 @@
                             </td>
                             <td><span class="badge bg-info text-dark">{{ ucfirst($project->category) }}</span></td>
                             <td>
-                                @foreach(explode(',', $project->technologies) as $tech)
-                                    <span class="badge bg-secondary">{{ trim($tech) }}</span>
-                                @endforeach
+                                @if($project->technologies)
+                                    @foreach(explode(',', $project->technologies) as $tech)
+                                        <span class="badge bg-secondary">{{ trim($tech) }}</span>
+                                    @endforeach
+                                @else
+                                    <span class="text-muted">Aucune</span>
+                                @endif
                             </td>
                             <td>
                                 @if($project->status === 'completed')
@@ -142,7 +150,7 @@
                             <td colspan="7" class="text-center py-5 text-muted">
                                 <i class="fas fa-folder-open fa-2x mb-2"></i><br>
                                 Aucun projet trouvé.<br>
-                                <a href="#" class="btn btn-primary mt-3"><i class="fas fa-plus me-2"></i>Créer un projet</a>
+                                <a href="{{ route('admin.projects.create') }}" class="btn btn-primary mt-3"><i class="fas fa-plus me-2"></i>Créer un projet</a>
                             </td>
                         </tr>
                         @endforelse

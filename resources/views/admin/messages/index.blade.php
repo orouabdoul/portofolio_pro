@@ -11,33 +11,7 @@
     </div>
 </div>
 <div class="container-fluid py-4">
-    <!-- Statistiques -->
-    @if($messages->count() > 0)
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="card shadow border-0">
-                    <div class="card-header bg-gradient text-white fw-bold" style="background: linear-gradient(90deg, #6366f1 0%, #a78bfa 100%);">
-                        <i class="fas fa-chart-pie me-2"></i> Statistiques des messages
-                    </div>
-                    <div class="card-body">
-                        <canvas id="messagesChart" height="120"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-    @else
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="card shadow border-0">
-                    <div class="card-body text-center py-5">
-                        <i class="fas fa-chart-pie fa-3x text-muted mb-3"></i>
-                        <h5 class="mb-2">Aucune statistique disponible</h5>
-                        <p class="text-muted">Aucun message n'a encore été reçu. Les statistiques apparaîtront ici dès réception de nouveaux messages.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    @endif
+   
     <div class="row g-4 mb-4">
         <div class="col-6 col-lg-3">
             <div class="card text-center shadow border-0 bg-white">
@@ -96,63 +70,43 @@
                     </tr>
                 </thead>
                 <tbody>
+                    @forelse($messages as $message)
                     <tr>
                         <td>
                             <div class="d-flex align-items-center">
-                                <div class="rounded-circle bg-primary text-white fw-bold d-flex align-items-center justify-content-center me-3" style="width:40px;height:40px;">A</div>
+                                <div class="rounded-circle bg-primary text-white fw-bold d-flex align-items-center justify-content-center me-3" style="width:40px;height:40px;">
+                                    {{ strtoupper(substr($message->name, 0, 1)) }}
+                                </div>
                                 <div>
-                                    <div class="fw-bold">Alice Dupont</div>
-                                    <div class="text-muted small">alice@email.com</div>
+                                    <div class="fw-bold">{{ $message->name }}</div>
+                                    <div class="text-muted small">{{ $message->email }}</div>
                                 </div>
                             </div>
                         </td>
-                        <td>Demande de devis</td>
-                        <td>15/09/2025 10:32</td>
-                        <td><span class="badge bg-success">Lu</span></td>
-                        <td class="text-center">
-                            <a href="#" class="btn btn-outline-primary btn-sm" title="Voir"><i class="fas fa-eye"></i></a>
-                            <a href="#" class="btn btn-outline-danger btn-sm" title="Supprimer"><i class="fas fa-trash"></i></a>
-                            <a href="mailto:alice@email.com?subject=Re: Demande de devis" class="btn btn-outline-info btn-sm" title="Répondre"><i class="fas fa-reply"></i></a>
-                        </td>
-                    </tr>
-                    <tr>
+                        <td>{{ $message->subject ?? '---' }}</td>
+                        <td>{{ $message->created_at ? $message->created_at->format('d/m/Y H:i') : '---' }}</td>
                         <td>
-                            <div class="d-flex align-items-center">
-                                <div class="rounded-circle bg-warning text-white fw-bold d-flex align-items-center justify-content-center me-3" style="width:40px;height:40px;">B</div>
-                                <div>
-                                    <div class="fw-bold">Benoit Martin</div>
-                                    <div class="text-muted small">benoit@email.com</div>
-                                </div>
-                            </div>
+                            @if(isset($message->is_read) && $message->is_read)
+                                <span class="badge bg-success">Lu</span>
+                            @else
+                                <span class="badge bg-warning text-dark">Non lu</span>
+                            @endif
                         </td>
-                        <td>Question technique</td>
-                        <td>14/09/2025 16:20</td>
-                        <td><span class="badge bg-warning text-dark">Non lu</span></td>
                         <td class="text-center">
-                            <a href="#" class="btn btn-outline-primary btn-sm" title="Voir"><i class="fas fa-eye"></i></a>
-                            <a href="#" class="btn btn-outline-danger btn-sm" title="Supprimer"><i class="fas fa-trash"></i></a>
-                            <a href="mailto:benoit@email.com?subject=Re: Question technique" class="btn btn-outline-info btn-sm" title="Répondre"><i class="fas fa-reply"></i></a>
+                            <a href="{{ route('admin.messages.show', $message->id) }}" class="btn btn-outline-primary btn-sm" title="Voir"><i class="fas fa-eye"></i></a>
+                            <form action="{{ route('admin.messages.destroy', $message->id) }}" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce message ? Cette action est irréversible.');" class="d-inline">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger btn-sm" title="Supprimer"><i class="fas fa-trash"></i></button>
+                            </form>
+                            <a href="mailto:{{ $message->email }}?subject=Re: {{ $message->subject ?? '' }}" class="btn btn-outline-info btn-sm" title="Répondre"><i class="fas fa-reply"></i></a>
                         </td>
                     </tr>
+                    @empty
                     <tr>
-                        <td>
-                            <div class="d-flex align-items-center">
-                                <div class="rounded-circle bg-info text-white fw-bold d-flex align-items-center justify-content-center me-3" style="width:40px;height:40px;">C</div>
-                                <div>
-                                    <div class="fw-bold">Carla Moreau</div>
-                                    <div class="text-muted small">carla@email.com</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td>Demande de support</td>
-                        <td>13/09/2025 09:10</td>
-                        <td><span class="badge bg-success">Lu</span></td>
-                        <td class="text-center">
-                            <a href="#" class="btn btn-outline-primary btn-sm" title="Voir"><i class="fas fa-eye"></i></a>
-                            <a href="#" class="btn btn-outline-danger btn-sm" title="Supprimer"><i class="fas fa-trash"></i></a>
-                            <a href="mailto:carla@email.com?subject=Re: Demande de support" class="btn btn-outline-info btn-sm" title="Répondre"><i class="fas fa-reply"></i></a>
-                        </td>
+                        <td colspan="5" class="text-center text-muted">Aucun message trouvé.</td>
                     </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
