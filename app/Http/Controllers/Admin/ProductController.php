@@ -9,7 +9,10 @@ class ProductController extends Controller
 {
     public function index()
     {
-        $products = Product::paginate(10);
+        $products = Product::query()
+            ->leftJoin('categories', 'products.category_id', '=', 'categories.id')
+            ->select('products.*', 'categories.name as category_name')
+            ->paginate(10);
         return view('admin.products.index', compact('products'));
     }
 
@@ -21,7 +24,8 @@ class ProductController extends Controller
 
     public function create()
     {
-        return view('admin.products.create');
+    $categories = \App\Models\Category::all();
+    return view('admin.products.create', compact('categories'));
     }
 
     public function store(Request $request)
@@ -31,6 +35,7 @@ class ProductController extends Controller
             'description' => 'nullable|string',
             'price' => 'required|numeric',
             'image' => 'nullable|image|max:2048',
+            'category_id' => 'required|exists:categories,id',
         ]);
         if ($request->hasFile('image')) {
             $validated['image_path'] = $request->file('image')->store('products/images', 'public');
@@ -43,8 +48,9 @@ class ProductController extends Controller
 
     public function edit($id)
     {
-        $product = Product::findOrFail($id);
-        return view('admin.products.edit', compact('product'));
+    $product = Product::findOrFail($id);
+    $categories = \App\Models\Category::all();
+    return view('admin.products.edit', compact('product', 'categories'));
     }
 
     public function update(Request $request, $id)
@@ -55,6 +61,7 @@ class ProductController extends Controller
             'description' => 'nullable|string',
             'price' => 'required|numeric',
             'image' => 'nullable|image|max:2048',
+            'category_id' => 'required|exists:categories,id',
         ]);
         if ($request->hasFile('image')) {
             $validated['image_path'] = $request->file('image')->store('products/images', 'public');

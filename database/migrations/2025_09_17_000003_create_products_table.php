@@ -12,6 +12,11 @@ return new class extends Migration {
             $table->string('name');
             $table->text('description')->nullable();
             $table->decimal('price', 10, 2)->nullable();
+            $table->string('image_path')->nullable();
+            $table->string('category')->nullable(); // legacy
+            $table->unsignedBigInteger('category_id')->nullable();
+            $table->foreign('category_id')->references('id')->on('categories')->nullOnDelete();
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }

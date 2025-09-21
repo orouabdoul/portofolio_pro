@@ -21,7 +21,7 @@ class AdminAuthController extends Controller
             'password' => 'required',
         ]);
         $admin = Admin::where('email', $request->email)->first();
-    if ($admin && password_verify($request->password, $admin->password)) {
+        if ($admin && \Illuminate\Support\Facades\Hash::check($request->password, $admin->password)) {
             Session::put('is_admin', true);
             return redirect('/admin/dashboard');
         }

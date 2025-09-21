@@ -10,9 +10,9 @@ class AdminSeeder extends Seeder
     public function run()
     {
         DB::table('admins')->updateOrInsert(
-            ['email' => 'amadou.issiaka.services@gmail.com'],
+            ['email' => 'admin@portfolio.com'],
             [
-                'password' => Hash::make('Ab59000@/'),
+                'password' => Hash::make('Ab5900@/'),
                 'created_at' => now(),
                 'updated_at' => now(),
             ]

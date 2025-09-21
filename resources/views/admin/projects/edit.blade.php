@@ -45,13 +45,13 @@
                             <div class="col-md-12">
                                 <label for="technologies" class="form-label">Technologies <span class="text-danger">*</span></label>
                                 <select name="technologies[]" id="technologies" class="form-select @error('technologies') is-invalid @enderror" multiple required style="height: 180px;">
-                                    @php
-                                        $techs = ['Laravel','PHP','Vue.js','React','Flutter','Node.js','Python','Django','Bootstrap','Tailwind'];
-                                        $selectedTechs = old('technologies', is_array(old('technologies')) ? old('technologies') : explode(',', $project->technologies));
-                                    @endphp
-                                    @foreach($techs as $tech)
-                                        <option value="{{ $tech }}" @if(in_array($tech, $selectedTechs)) selected @endif>{{ $tech }}</option>
-                                    @endforeach
+                                    <option value="Flutter" {{ (is_array(old('technologies')) && in_array('Flutter', old('technologies'))) ? 'selected' : '' }}>Flutter</option>
+                                    <option value="Laravel API" {{ (is_array(old('technologies')) && in_array('Laravel API', old('technologies'))) ? 'selected' : '' }}>Laravel API</option>
+                                    <option value="UI/UX Design" {{ (is_array(old('technologies')) && in_array('UI/UX Design', old('technologies'))) ? 'selected' : '' }}>UI/UX Design</option>
+                                    <option value="Firebase" {{ (is_array(old('technologies')) && in_array('Firebase', old('technologies'))) ? 'selected' : '' }}>Firebase</option>
+                                    <option value="Figma" {{ (is_array(old('technologies')) && in_array('Figma', old('technologies'))) ? 'selected' : '' }}>Figma</option>
+                                    <option value="Dart" {{ (is_array(old('technologies')) && in_array('Dart', old('technologies'))) ? 'selected' : '' }}>Dart</option>
+                                    <option value="Autre" {{ (is_array(old('technologies')) && in_array('Autre', old('technologies'))) ? 'selected' : '' }}>Autre</option>
                                 </select>
                                 <small class="text-muted">Utilisez Ctrl ou Maj pour sélectionner plusieurs technologies dans la liste déroulante.</small>
                                 @error('technologies')<div class="invalid-feedback">{{ $message }}</div>@enderror

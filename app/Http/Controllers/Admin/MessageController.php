@@ -10,6 +10,13 @@ use Illuminate\Support\Facades\Mail;
 
 class MessageController extends Controller
 {
+    public function markAsRead($id)
+    {
+        $message = Contact::findOrFail($id);
+        $message->is_read = true;
+        $message->save();
+        return back()->with('success', 'Message marqué comme lu.');
+    }
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -17,8 +24,11 @@ class MessageController extends Controller
             'email' => 'required|email|max:255',
             'message' => 'required|string',
         ]);
+        if (\App\Models\Contact::where('email', $validated['email'])->exists()) {
+            return redirect('/')->with('error', 'Cet email a déjà été utilisé pour envoyer un message.');
+        }
         Contact::create($validated);
-        return redirect()->back()->with('success', 'Votre message a bien été envoyé !');
+        return redirect('/')->with('success', 'Votre message a bien été envoyé !');
     }
 
     public function index()
@@ -55,8 +65,10 @@ class MessageController extends Controller
 
         $error_message = null;
         $sent_successfully = false;
+        $whatsapp_link = "\n\nEnvoyez un message à Vistronix Business sur WhatsApp. https://wa.me/22959000892";
+        $full_reply = $request->input('reply_message') . $whatsapp_link;
         try {
-            Mail::raw($request->input('reply_message'), function ($mail) use ($message, $request) {
+            Mail::raw($full_reply, function ($mail) use ($message, $request) {
                 $mail->to($message->email)
                     ->subject($request->input('reply_subject'));
             });
@@ -69,7 +81,7 @@ class MessageController extends Controller
         \App\Models\Reply::create([
             'contact_id' => $message->id,
             'subject' => $request->input('reply_subject'),
-            'message' => $request->input('reply_message'),
+            'message' => $full_reply,
             'admin_name' => auth()->user()->name ?? 'Admin',
             'admin_email' => auth()->user()->email ?? 'admin@portfolio.com',
             'sent_successfully' => $sent_successfully,

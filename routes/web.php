@@ -7,9 +7,7 @@ use App\Http\Controllers\Admin\MessageExportController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('index');
-});
+Route::get('/', [\App\Http\Controllers\HomeController::class, 'index']);
 
  
  
@@ -38,12 +36,7 @@ Route::group(['prefix' => 'admin', 'middleware' => function ($request, $next) {
     // Export PDF/Excel des messages
     Route::get('/messages/export/{format}', [MessageExportController::class, 'export'])->name('admin.messages.export');
     // Dashboard
-        Route::get('/dashboard', function () {
-    $messages = \App\Models\Contact::all();
-        $projects = \App\Models\Project::all();
-        $products = \App\Models\Product::all();
-        return view('admin.dashboard', compact('messages', 'projects', 'products'));
-        })->name('admin.dashboard');
+        Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('admin.dashboard');
 
     // Messages
     Route::get('/messages', [\App\Http\Controllers\Admin\MessageController::class, 'index'])->name('admin.messages');
@@ -82,9 +75,7 @@ Route::group(['prefix' => 'admin', 'middleware' => function ($request, $next) {
     // Détail d'un message (dashboard et contacts)
 
     // Actions fictives pour éviter erreurs dans la vue message-show
-    Route::post('/messages/{id}/read', function ($id) {
-        return back()->with('success', 'Message marqué comme lu (simulation)');
-    })->name('admin.messages.read');
+    Route::post('/messages/{id}/read', [\App\Http\Controllers\Admin\MessageController::class, 'markAsRead'])->name('admin.messages.read');
     Route::post('/messages/{id}/reply', [\App\Http\Controllers\Admin\MessageController::class, 'reply'])->name('admin.messages.reply');
 
     // Déconnexion
@@ -92,5 +83,5 @@ Route::group(['prefix' => 'admin', 'middleware' => function ($request, $next) {
 });
 
 // Lien portfolio public
-Route::get('/portfolio', function () { return redirect('/'); })->name('portfolio');
+Route::get('/portfolio', [\App\Http\Controllers\HomeController::class, 'redirectPortfolio'])->name('portfolio');
 Route::delete('/admin/projects/{project}', [\App\Http\Controllers\Admin\ProjectController::class, 'destroy'])->name('admin.projects.delete');
