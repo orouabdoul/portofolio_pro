@@ -64,18 +64,20 @@ Route::group(['prefix' => 'admin', 'middleware' => function ($request, $next) {
     Route::get('/products/{id}', [\App\Http\Controllers\Admin\ProductController::class, 'show'])->name('admin.products.show');
 
     // Analytics
-    Route::view('/analytics', 'admin.analytics')->name('admin.analytics');
+    Route::get('/analytics', [\App\Http\Controllers\Admin\AnalyticsController::class, 'index'])->name('admin.analytics');
 
     // Paramètres
-    Route::view('/settings', 'admin.settings')->name('admin.settings');
+    Route::get('/settings', [\App\Http\Controllers\Admin\SettingsController::class, 'index'])->name('admin.settings');
+    Route::post('/settings', [\App\Http\Controllers\Admin\SettingsController::class, 'update'])->name('admin.settings.update');
 
     // Config Email
-    Route::view('/email-setup', 'admin.email-setup')->name('admin.email-setup');
+    Route::get('/email-setup', [\App\Http\Controllers\Admin\EmailSetupController::class, 'index'])->name('admin.email-setup');
+    Route::post('/email-setup', [\App\Http\Controllers\Admin\EmailSetupController::class, 'update'])->name('admin.email-setup.update');
 
     // Détail d'un message (dashboard et contacts)
 
     // Actions fictives pour éviter erreurs dans la vue message-show
-    Route::post('/messages/{id}/read', [\App\Http\Controllers\Admin\MessageController::class, 'markAsRead'])->name('admin.messages.read');
+    Route::post('/messages/{id}/mark-read', [\App\Http\Controllers\Admin\MessageController::class, 'markAsReadAjax'])->name('admin.messages.markRead');
     Route::post('/messages/{id}/reply', [\App\Http\Controllers\Admin\MessageController::class, 'reply'])->name('admin.messages.reply');
 
     // Déconnexion

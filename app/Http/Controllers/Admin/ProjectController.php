@@ -88,6 +88,10 @@ public function update(Request $request, $id)
     public function show($id)
     {
         $project = Project::findOrFail($id);
+        if (property_exists($project, 'is_read') && !$project->is_read) {
+            $project->is_read = true;
+            $project->save();
+        }
         return view('admin.projects.show', compact('project'));
     }
 

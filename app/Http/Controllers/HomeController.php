@@ -11,6 +11,7 @@ class HomeController extends Controller
     }
     public function index()
     {
-        return view('index');
+        $projects = \App\Models\Project::where('is_active', true)->orderBy('created_at', 'desc')->get();
+        return view('index', compact('projects'));
     }
 }

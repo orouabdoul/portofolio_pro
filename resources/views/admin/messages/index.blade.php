@@ -93,7 +93,7 @@
                             @endif
                         </td>
                         <td class="text-center">
-                            <a href="{{ route('admin.messages.show', $message->id) }}" class="btn btn-outline-primary btn-sm" title="Voir"><i class="fas fa-eye"></i></a>
+                            <a href="{{ route('admin.messages.show', $message->id) }}" class="btn btn-outline-primary btn-sm mark-read-btn" data-id="{{ $message->id }}" title="Voir"><i class="fas fa-eye"></i></a>
                             <form action="{{ route('admin.messages.destroy', $message->id) }}" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce message ? Cette action est irréversible.');" class="d-inline">
                                 @csrf
                                 @method('DELETE')
@@ -159,5 +159,33 @@
             notif.style.display = 'none';
         }, 5000);
     }, 3000);
+
+    // AJAX pour marquer comme lu
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.mark-read-btn').forEach(function(btn) {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                var id = this.getAttribute('data-id');
+                var row = this.closest('tr');
+                var href = this.getAttribute('href');
+                // Mise à jour immédiate du badge
+                var badge = row.querySelector('span.badge');
+                badge.classList.remove('bg-warning', 'text-dark');
+                badge.classList.add('bg-success');
+                badge.textContent = 'Lu';
+                // AJAX pour marquer comme lu
+                fetch('/admin/messages/' + id + '/mark-read', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    }
+                })
+                .finally(() => {
+                    window.location.href = href;
+                });
+            });
+        });
+    });
 </script>
 @endpush

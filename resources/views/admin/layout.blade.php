@@ -203,16 +203,34 @@
                 </nav>
                 <div class="container-fluid py-4">
                     @if(session('success'))
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <div class="alert alert-success alert-dismissible fade show" role="alert" id="admin-success-alert">
                             <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
+                        <script>
+                            setTimeout(function() {
+                                var alert = document.getElementById('admin-success-alert');
+                                if(alert) {
+                                    alert.classList.remove('show');
+                                    alert.classList.add('hide');
+                                }
+                            }, 4000);
+                        </script>
                     @endif
                     @if(session('error'))
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert" id="admin-error-alert">
                             <i class="fas fa-exclamation-circle me-2"></i> {{ session('error') }}
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
+                        <script>
+                            setTimeout(function() {
+                                var alert = document.getElementById('admin-error-alert');
+                                if(alert) {
+                                    alert.classList.remove('show');
+                                    alert.classList.add('hide');
+                                }
+                            }, 4000);
+                        </script>
                     @endif
                     @yield('content')
                 </div>
