@@ -9,9 +9,24 @@ class HomeController extends Controller
     {
         return redirect('/');
     }
+
     public function index()
     {
         $projects = \App\Models\Project::where('is_active', true)->orderBy('created_at', 'desc')->get();
         return view('index', compact('projects'));
+    }
+
+    // Nouvelle méthode pour filtrer
+    public function filterPortfolio(Request $request)
+    {
+        $category = $request->input('category');
+        $query = \App\Models\Project::where('is_active', true)->orderBy('created_at', 'desc');
+
+        if ($category && $category !== 'Tous') {
+            $query->where('category', $category);
+        }
+
+        $projects = $query->get();
+        return view('index', ['projects' => $projects]);
     }
 }

@@ -40,19 +40,6 @@
                 </div>
             </div>
         </div>
-        <div class="col-12 col-md-6 col-lg-4">
-            <div class="card h-100 bg-dark text-white shadow-lg rounded-4">
-                <div class="card-body d-flex flex-column align-items-center text-center">
-                    <div class="mb-3">
-                        <i class="bi bi-cart-fill text-info" style="font-size:2.5rem;"></i>
-                    </div>
-                    <h5 class="card-title fw-bold text-info mb-2">E-Commerce</h5>
-                    <p class="card-text mb-4">Nous sommes également actifs dans le e-commerce, avec une expérience directe dans la vente de produits physiques. Cela signifie que nous ne nous limitons pas à concevoir des solutions numériques théoriques : nous vivons chaque jour les réalités du terrain.</p>
-                    <a href="#" class="btn btn-info text-white fw-semibold rounded-pill px-4 py-2">En savoir plus</a>
-                </div>
-            </div>
-        </div>
-        
     </div>
 </div>
 </section>

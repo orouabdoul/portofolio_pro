@@ -135,11 +135,7 @@
                             <i class="fas fa-folder-open me-2"></i> Projets
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a href="{{ route('admin.products') }}" class="nav-link {{ Request::routeIs('admin.products*') ? 'active' : '' }}">
-                            <i class="fas fa-box-open me-2"></i> Produits
-                        </a>
-                    </li>
+
                     <li class="nav-item">
                         <a href="{{ route('admin.analytics') }}" class="nav-link {{ Request::routeIs('admin.analytics') ? 'active' : '' }}">
                             <i class="fas fa-chart-line me-2"></i> Analytics

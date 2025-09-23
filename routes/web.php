@@ -8,6 +8,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [\App\Http\Controllers\HomeController::class, 'index']);
+Route::get('/portfolio/filter', [\App\Http\Controllers\HomeController::class, 'filterPortfolio'])->name('portfolio.filter');
 
  
  
@@ -54,14 +55,6 @@ Route::group(['prefix' => 'admin', 'middleware' => function ($request, $next) {
     Route::get('/projects/{id}', [ProjectController::class, 'show'])->name('admin.projects.show');
     Route::patch('/projects/{project}/toggle', [ProjectController::class, 'toggle'])->name('admin.projects.toggle');
 
-    // Produits
-    Route::get('/products', [\App\Http\Controllers\Admin\ProductController::class, 'index'])->name('admin.products');
-    Route::get('/products/create', [\App\Http\Controllers\Admin\ProductController::class, 'create'])->name('admin.products.create');
-    Route::post('/products', [\App\Http\Controllers\Admin\ProductController::class, 'store'])->name('admin.products.store');
-    Route::get('/products/{id}/edit', [\App\Http\Controllers\Admin\ProductController::class, 'edit'])->name('admin.products.edit');
-    Route::put('/products/{id}', [\App\Http\Controllers\Admin\ProductController::class, 'update'])->name('admin.products.update');
-    Route::delete('/products/{id}', [\App\Http\Controllers\Admin\ProductController::class, 'destroy'])->name('admin.products.destroy');
-    Route::get('/products/{id}', [\App\Http\Controllers\Admin\ProductController::class, 'show'])->name('admin.products.show');
 
     // Analytics
     Route::get('/analytics', [\App\Http\Controllers\Admin\AnalyticsController::class, 'index'])->name('admin.analytics');

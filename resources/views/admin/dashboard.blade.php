@@ -33,19 +33,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-12 col-sm-6 col-lg-4">
-            <div class="card text-white shadow-lg border-0" style="background: linear-gradient(90deg, #ef4444 0%, #a78bfa 100%);">
-                <div class="card-body d-flex align-items-center">
-                    <div class="me-3">
-                        <i class="fas fa-box-open fa-2x"></i>
-                    </div>
-                    <div>
-                        <div class="h3 mb-0 fw-bold">{{ $products->count() ?? 0 }}</div>
-                        <div class="small">Produits</div>
-                    </div>
-                </div>
-            </div>
-        </div>
+
     </div>
 
     <!-- Notifications -->
@@ -65,7 +53,7 @@
             <ul class="list-group list-group-flush">
                 <li class="list-group-item">Répondre aux nouveaux messages</li>
                 <li class="list-group-item">Ajouter un nouveau projet au portfolio</li>
-                <li class="list-group-item">Mettre à jour la fiche produit</li>
+
                 <li class="list-group-item">Vérifier les statistiques de visite</li>
             </ul>
         </div>

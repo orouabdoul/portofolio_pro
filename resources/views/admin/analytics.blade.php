@@ -19,14 +19,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card shadow-lg border-0 rounded-4" style="background: linear-gradient(135deg,#f59e42 0%,#fbbf24 100%);">
-            <div class="card-body text-center">
-                <h5 class="card-title text-white">Produits</h5>
-                <p class="display-6 fw-bold text-white">{{ $productsCount }}</p>
-            </div>
-        </div>
-    </div>
+
 </div>
 <div class="card shadow-lg border-0 rounded-4 mb-4">
     <div class="card-body">
@@ -36,7 +29,6 @@
             window.analyticsLabels = @json($labels);
             window.analyticsContacts = @json($contactsEvolution);
             window.analyticsProjects = @json($projectsEvolution);
-            window.analyticsProducts = @json($productsEvolution);
         </script>
     </div>
 </div>
@@ -66,14 +58,6 @@
                         tension: 0.4,
                         fill: true
                     },
-                    {
-                        label: 'Produits',
-                        data: window.analyticsProducts,
-                        borderColor: '#f59e42',
-                        backgroundColor: 'rgba(245,158,66,0.1)',
-                        tension: 0.4,
-                        fill: true
-                    }
                 ]
             },
             options: {

@@ -1,0 +1,5 @@
+Suppression des fichiers liés au modèle, contrôleur et migrations de produit le 23/09/2025 :
+- app/Http/Controllers/Admin/ProductController.php
+- app/Models/Product.php
+- database/migrations/2025_09_17_000003_create_products_table.php
+- database/migrations/2025_09_21_000004_add_image_path_to_products_table.php
