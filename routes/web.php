@@ -10,8 +10,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [\App\Http\Controllers\HomeController::class, 'index']);
 Route::get('/portfolio/filter', [\App\Http\Controllers\HomeController::class, 'filterPortfolio'])->name('portfolio.filter');
 
- 
- 
+// Route publique pour le formulaire de contact
+Route::post('/contact', [\App\Http\Controllers\Admin\MessageController::class, 'store'])->name('contact.submit');
 
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -41,7 +41,6 @@ Route::group(['prefix' => 'admin', 'middleware' => function ($request, $next) {
 
     // Messages
     Route::get('/messages', [\App\Http\Controllers\Admin\MessageController::class, 'index'])->name('admin.messages');
-    Route::post('/contact', [\App\Http\Controllers\Admin\MessageController::class, 'store'])->name('contact.submit');
     Route::get('/messages/{id}', [\App\Http\Controllers\Admin\MessageController::class, 'show'])->name('admin.messages.show');
     Route::delete('/messages/{id}', [\App\Http\Controllers\Admin\MessageController::class, 'destroy'])->name('admin.messages.destroy');
 
