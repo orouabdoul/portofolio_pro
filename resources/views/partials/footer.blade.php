@@ -28,10 +28,7 @@
           <i class="bi bi-shield-lock" style="opacity:0.3; margin-left: 5px;"></i>
         </a>
         <!-- CV download -->
-        <a href="/cv-frnch.pdf" class="text-info text-decoration-underline small ms-3" download rel="noopener" title="Télécharger mon CV">
-          <i class="bi bi-file-earmark-person" style="font-size:1.25rem; vertical-align: middle;"></i>
-          <span class="ms-1 small">CV (FR)</span>
-        </a>
+        
       </div>
     </div>
   </div>
