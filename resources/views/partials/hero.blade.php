@@ -65,7 +65,7 @@
                 </p>
                 <div class="d-flex flex-wrap gap-3 align-items-center">
                     <a href="#contact" class="btn btn-info text-dark fw-bold rounded-pill px-4 py-2 shadow-sm" style="font-size:1.3rem; min-width:200px;">Discutons de votre projet</a>
-                    <a href="/cv.pdf" class="btn btn-outline-light fw-bold rounded-pill px-4 py-2 shadow-sm" style="font-size:1.3rem; min-width:180px;" download>Télécharger mon CV</a>
+                    <a href="/cv-frnch.pdf" class="btn btn-outline-light fw-bold rounded-pill px-4 py-2 shadow-sm" style="font-size:1.3rem; min-width:180px;" download>Télécharger mon CV</a>
                 </div>
             </div>
             <div class="col-lg-5 d-none d-lg-flex justify-content-center align-items-center position-relative">
