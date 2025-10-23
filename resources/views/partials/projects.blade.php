@@ -33,7 +33,7 @@
             data-category="{{ e($project->category ?? ($project->type ?? 'Projet')) }}"
             data-description="{{ e($project->description ?? $project->short_description) }}"
             data-image="{{ $imageUrl }}"
-            data-technologies="{{ e($project->technologies ?? '') }}"
+            data-technologies="{{ e(is_array($project->technologies) ? implode(',', $project->technologies) : ($project->technologies ?? '')) }}"
             data-demo-url="{{ e($project->demo_url ?? '') }}"
             data-github-url="{{ e($project->github_url ?? '') }}"
             style="cursor:pointer;">
