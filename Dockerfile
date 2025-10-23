@@ -14,8 +14,6 @@ COPY composer.json composer.lock ./
 # Install dependencies without running scripts (avoids calling artisan during build)
 RUN composer install --no-dev --no-interaction --prefer-dist --no-progress --no-scripts --no-autoloader
 
-RUN touch /var/www/database/database.sqlite
-
 # Stage 3 - Final image
 FROM php:8.2-fpm
 
