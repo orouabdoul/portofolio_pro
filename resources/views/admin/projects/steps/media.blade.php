@@ -306,10 +306,11 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Mise à jour du résumé
     function updateSummary() {
-        // Récupérer les données des étapes précédentes depuis le sessionStorage ou les champs
-        const title = sessionStorage.getItem('project_title') || '{{ $formData["title"] ?? "Titre du projet" }}';
-        const category = sessionStorage.getItem('project_category') || '{{ $formData["category"] ?? "Catégorie" }}';
-        const technologies = sessionStorage.getItem('project_technologies') || '{{ $formData["technologies"] ?? "Technologies" }}';
+    // Récupérer les données des étapes précédentes depuis le sessionStorage ou les champs
+    // Use json_encode to safely serialize server values into JS strings (avoids injecting arrays)
+    const title = sessionStorage.getItem('project_title') || {!! json_encode($formData['title'] ?? 'Titre du projet') !!};
+    const category = sessionStorage.getItem('project_category') || {!! json_encode($formData['category'] ?? 'Catégorie') !!};
+    const technologies = sessionStorage.getItem('project_technologies') || {!! json_encode(is_array($formData['technologies'] ?? null) ? implode(',', $formData['technologies']) : ($formData['technologies'] ?? 'Technologies')) !!};
         
         document.getElementById('summary-title').textContent = title;
         document.getElementById('summary-category').textContent = getCategoryIcon(category) + ' ' + getCategoryName(category);

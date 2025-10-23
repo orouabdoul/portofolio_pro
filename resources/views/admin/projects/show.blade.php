@@ -74,8 +74,14 @@
                 <div class="card-body">
                     <h5 class="card-title text-secondary mb-3"><i class="fas fa-code me-2"></i>Technologies</h5>
                     @php
-                        $technologies = is_string($project->technologies) ? explode(',', $project->technologies) : ($project->technologies ?? []);
-                        $technologies = array_filter(array_map('trim', $technologies));
+                        // Normalize technologies: if string, split by commas; if array, use as-is; otherwise empty array
+                        if (is_array($project->technologies)) {
+                            $technologies = $project->technologies;
+                        } elseif (is_string($project->technologies) && strlen($project->technologies) > 0) {
+                            $technologies = array_filter(array_map('trim', explode(',', $project->technologies)));
+                        } else {
+                            $technologies = [];
+                        }
                     @endphp
                     @foreach($technologies as $tech)
                         <span class="badge bg-gradient bg-primary text-light me-2 mb-2"><i class="fas fa-hashtag me-1"></i>{{ $tech }}</span>

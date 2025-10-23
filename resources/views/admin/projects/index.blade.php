@@ -94,11 +94,13 @@
                             <td><span class="badge bg-info text-dark">{{ ucfirst($project->category) }}</span></td>
                             <td>
                                 @php
-                                    $techs = [];
+                                    // Normalize technologies to an array whether stored as CSV or JSON/array
                                     if (is_array($project->technologies)) {
                                         $techs = $project->technologies;
-                                    } elseif ($project->technologies) {
-                                        $techs = explode(',', $project->technologies);
+                                    } elseif (is_string($project->technologies) && strlen($project->technologies) > 0) {
+                                        $techs = array_filter(array_map('trim', explode(',', $project->technologies)));
+                                    } else {
+                                        $techs = [];
                                     }
                                 @endphp
                                 @if(count($techs) > 0)
