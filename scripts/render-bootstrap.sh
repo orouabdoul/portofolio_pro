@@ -51,4 +51,10 @@ else
   echo "[render-bootstrap] RUN_MIGRATIONS not true; skipping migrations"
 fi
 
+# Optionally create default admin user via seeder
+if [ "${CREATE_ADMIN}" = "true" ]; then
+  echo "[render-bootstrap] running AdminSeeder to ensure admin user exists"
+  php artisan db:seed --class=\"Database\\Seeders\\AdminSeeder\" || true
+fi
+
 echo "[render-bootstrap] done"

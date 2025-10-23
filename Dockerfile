@@ -133,6 +133,16 @@ if [ "${RUN_MIGRATIONS}" = "true" ]; then
     fi
 fi
 
+# Optionally create default admin user via seeder
+if [ "${CREATE_ADMIN}" = "true" ]; then
+    if [ -f artisan ]; then
+        echo "Seeding AdminSeeder to ensure admin user exists..."
+        php artisan db:seed --class="Database\\Seeders\\AdminSeeder" || true
+    else
+        echo "No artisan found; skipping AdminSeeder"
+    fi
+fi
+
 # Optionally create storage symlink if RUN_STORAGE_LINK=true
 if [ "${RUN_STORAGE_LINK}" = "true" ]; then
     if [ -f artisan ]; then
