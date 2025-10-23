@@ -93,8 +93,16 @@
                             </td>
                             <td><span class="badge bg-info text-dark">{{ ucfirst($project->category) }}</span></td>
                             <td>
-                                @if($project->technologies)
-                                    @foreach(explode(',', $project->technologies) as $tech)
+                                @php
+                                    $techs = [];
+                                    if (is_array($project->technologies)) {
+                                        $techs = $project->technologies;
+                                    } elseif ($project->technologies) {
+                                        $techs = explode(',', $project->technologies);
+                                    }
+                                @endphp
+                                @if(count($techs) > 0)
+                                    @foreach($techs as $tech)
                                         <span class="badge bg-secondary">{{ trim($tech) }}</span>
                                     @endforeach
                                 @else
