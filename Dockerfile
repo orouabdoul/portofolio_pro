@@ -11,7 +11,8 @@ RUN npm run build
 FROM composer:2 AS composer
 WORKDIR /var/www
 COPY composer.json composer.lock ./
-RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader --no-progress
+# Install dependencies without running scripts (avoids calling artisan during build)
+RUN composer install --no-dev --no-interaction --prefer-dist --no-progress --no-scripts --no-autoloader
 
 # Stage 3 - Final image
 FROM php:8.2-fpm
@@ -40,6 +41,9 @@ COPY --from=frontend /app/public/build ./public/build
 # Ensure correct permissions for Laravel
 RUN chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
+
+# Generate optimized autoload files now that app files are present
+RUN composer dump-autoload --optimize
 
 # Default PORT used by Render; php -S will bind to this port at runtime
 ENV PORT=10000
