@@ -51,7 +51,16 @@ class HomeController extends Controller
             }
         }
 
-        $projects = $query->get();
+        try {
+            $projects = $query->get();
+        } catch (QueryException $e) {
+            Log::error('HomeController@filterPortfolio QueryException (get): ' . $e->getMessage());
+            $projects = collect();
+        } catch (\Exception $e) {
+            Log::error('HomeController@filterPortfolio Exception (get): ' . $e->getMessage());
+            $projects = collect();
+        }
+
         return view('index', ['projects' => $projects]);
     }
 }
