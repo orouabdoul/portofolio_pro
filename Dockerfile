@@ -19,7 +19,7 @@ FROM php:8.2-fpm
 
 # Install system dependencies and PHP extensions commonly used by Laravel
 RUN apt-get update && apt-get install -y \
-    git curl unzip libpq-dev libonig-dev libzip-dev zip libpng-dev libjpeg-dev libfreetype6-dev \
+    git curl unzip libpq-dev libonig-dev libzip-dev zip libpng-dev libjpeg-dev libfreetype6-dev pkg-config libsqlite3-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install pdo_mysql pdo_sqlite mbstring zip gd \
     && rm -rf /var/lib/apt/lists/*
