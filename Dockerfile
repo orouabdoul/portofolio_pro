@@ -35,7 +35,7 @@ COPY . .
 COPY --from=composer /var/www/vendor ./vendor
 
 # Copy built frontend assets (adjust path if your Vite outputs to public/dist)
-COPY --from=frontend /app/public/dist ./public/dist
+COPY --from=frontend /app/public/build ./public/build
 
 # Ensure correct permissions for Laravel
 RUN chown -R www-data:www-data storage bootstrap/cache \
@@ -49,55 +49,55 @@ RUN apt-get update && apt-get install -y nginx gettext-base \
     && rm -rf /var/lib/apt/lists/*
 
 # Create nginx config template that listens on the port provided by Render via $PORT
-RUN mkdir -p /etc/nginx/conf.d && cat > /etc/nginx/conf.d/default.conf.template <<'NGINXCONF'\
-server {\
-    listen ${PORT} default_server;\
-    server_name _;\
-    root /var/www/public;\
-    index index.php index.html index.htm;\
-\
-    access_log /var/log/nginx/access.log;\
-    error_log /var/log/nginx/error.log;\
-\
-    location / {\
-        try_files $uri $uri/ /index.php?$query_string;\
-    }\
-\
-    location ~ \\\.php$ {\
-        include fastcgi_params;\
-        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;\
-        fastcgi_pass 127.0.0.1:9000;\
-    }\
-\
-    location ~ /\\.(env|git) {\
-        deny all;\
-    }\
-}\
+RUN mkdir -p /etc/nginx/conf.d && cat > /etc/nginx/conf.d/default.conf.template <<'NGINXCONF'
+server {
+    listen ${PORT} default_server;
+    server_name _;
+    root /var/www/public;
+    index index.php index.html index.htm;
+
+    access_log /var/log/nginx/access.log;
+    error_log /var/log/nginx/error.log;
+
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    location ~ \.php$ {
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_pass 127.0.0.1:9000;
+    }
+
+    location ~ /\.(env|git) {
+        deny all;
+    }
+}
 NGINXCONF
 
 # Entrypoint script: substitute PORT and start php-fpm + nginx
-RUN cat > /usr/local/bin/docker-entrypoint.sh <<'EOF'\
-#!/bin/sh\
-set -e\
-\
-: ${PORT:=10000}\
-echo "Starting container, substituting PORT=${PORT} into nginx config..."\
-envsubst '${PORT}' < /etc/nginx/conf.d/default.conf.template > /etc/nginx/conf.d/default.conf\
-\
+RUN cat > /usr/local/bin/docker-entrypoint.sh <<'EOF'
+#!/bin/sh
+set -e
+
+: ${PORT:=10000}
+echo "Starting container, substituting PORT=${PORT} into nginx config..."
+envsubst '${PORT}' < /etc/nginx/conf.d/default.conf.template > /etc/nginx/conf.d/default.conf
+
 # Clear caches safely if artisan exists (ignore errors)
-if [ -f artisan ]; then\
-  php artisan config:clear || true\
-  php artisan route:clear || true\
-  php artisan view:clear || true\
-fi\
-\
-# Ensure permissions (again)\
-chown -R www-data:www-data storage bootstrap/cache || true\
-chmod -R 775 storage bootstrap/cache || true\
-\
+if [ -f artisan ]; then
+    php artisan config:clear || true
+    php artisan route:clear || true
+    php artisan view:clear || true
+fi
+
+# Ensure permissions (again)
+chown -R www-data:www-data storage bootstrap/cache || true
+chmod -R 775 storage bootstrap/cache || true
+
 # Start php-fpm (daemonize) and nginx in foreground
-php-fpm -D\
-exec nginx -g 'daemon off;'\
+php-fpm -D
+exec nginx -g 'daemon off;'
 EOF
 
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
