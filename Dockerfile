@@ -21,7 +21,7 @@ FROM php:8.2-fpm
 RUN apt-get update && apt-get install -y \
     git curl unzip libpq-dev libonig-dev libzip-dev zip libpng-dev libjpeg-dev libfreetype6-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install pdo_mysql mbstring zip gd \
+    && docker-php-ext-install pdo_mysql pdo_sqlite mbstring zip gd \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Composer binary
