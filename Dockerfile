@@ -113,6 +113,36 @@ if [ "${DB_CONNECTION}" = "sqlite" ] || [ -z "${DB_CONNECTION}" ]; then
     fi
 fi
 
+# Optionally generate APP_KEY (only if APP_KEY is empty and GENERATE_APP_KEY=true)
+if [ -z "${APP_KEY}" ] && [ "${GENERATE_APP_KEY}" = "true" ]; then
+    if [ -f artisan ]; then
+        echo "Generating APP_KEY via artisan..."
+        php artisan key:generate --force || true
+    else
+        echo "No artisan found; skipping APP_KEY generation"
+    fi
+fi
+
+# Optionally run migrations if RUN_MIGRATIONS=true
+if [ "${RUN_MIGRATIONS}" = "true" ]; then
+    if [ -f artisan ]; then
+        echo "Running migrations (php artisan migrate --force)..."
+        php artisan migrate --force || true
+    else
+        echo "No artisan found; skipping migrations"
+    fi
+fi
+
+# Optionally create storage symlink if RUN_STORAGE_LINK=true
+if [ "${RUN_STORAGE_LINK}" = "true" ]; then
+    if [ -f artisan ]; then
+        echo "Creating storage symlink (php artisan storage:link)..."
+        php artisan storage:link || true
+    else
+        echo "No artisan found; skipping storage:link"
+    fi
+fi
+
 # Start php-fpm (daemonize) and nginx in foreground
 php-fpm -D
 exec nginx -g 'daemon off;'
