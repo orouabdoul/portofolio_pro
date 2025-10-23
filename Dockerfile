@@ -99,6 +99,20 @@ fi
 chown -R www-data:www-data storage bootstrap/cache || true
 chmod -R 775 storage bootstrap/cache || true
 
+# If the app uses SQLite, ensure the database file exists and is writable
+if [ "${DB_CONNECTION}" = "sqlite" ] || [ -z "${DB_CONNECTION}" ]; then
+    # Default path if DB_DATABASE is empty
+    DB_FILE=${DB_DATABASE:-/var/www/database/database.sqlite}
+    DB_DIR=$(dirname "${DB_FILE}")
+    mkdir -p "${DB_DIR}"
+    if [ ! -f "${DB_FILE}" ]; then
+        echo "Creating SQLite database file at ${DB_FILE}"
+        touch "${DB_FILE}"
+        chown www-data:www-data "${DB_FILE}"
+        chmod 664 "${DB_FILE}"
+    fi
+fi
+
 # Start php-fpm (daemonize) and nginx in foreground
 php-fpm -D
 exec nginx -g 'daemon off;'
