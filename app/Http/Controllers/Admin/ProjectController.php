@@ -4,12 +4,23 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Project;
 use Illuminate\Http\Request;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Log;
 
 class ProjectController extends Controller
 {
     public function index()
     {
-        $projects = Project::paginate(10);
+        try {
+            $projects = Project::paginate(10);
+        } catch (QueryException $e) {
+            Log::error('Admin\\ProjectController@index QueryException: ' . $e->getMessage());
+            $projects = collect();
+        } catch (\Exception $e) {
+            Log::error('Admin\\ProjectController@index Exception: ' . $e->getMessage());
+            $projects = collect();
+        }
+
         return view('admin.projects.index', compact('projects'));
     }
 
@@ -42,20 +53,35 @@ class ProjectController extends Controller
         if (isset($validated['image'])) {
             unset($validated['image']);
         }
-        $project = Project::create($validated);
-        return redirect()->route('admin.projects')->with('success', 'Projet créé avec succès.');
+        try {
+            $project = Project::create($validated);
+            return redirect()->route('admin.projects')->with('success', 'Projet créé avec succès.');
+        } catch (QueryException $e) {
+            Log::error('Admin\\ProjectController@store QueryException: ' . $e->getMessage());
+            return redirect()->back()->withInput()->with('error', 'Impossible de créer le projet : problème de base de données.');
+        }
     }
 
     public function edit($id)
     {
-        $project = Project::findOrFail($id);
+        try {
+            $project = Project::findOrFail($id);
+        } catch (QueryException $e) {
+            Log::error('Admin\\ProjectController@edit QueryException: ' . $e->getMessage());
+            return redirect()->route('admin.projects')->with('error', 'Projet introuvable ou problème de base de données.');
+        }
         return view('admin.projects.edit', compact('project'));
     }
 
     // ...existing code...
 public function update(Request $request, $id)
 {
-    $project = Project::findOrFail($id);
+    try {
+        $project = Project::findOrFail($id);
+    } catch (QueryException $e) {
+        Log::error('Admin\\ProjectController@update QueryException (find): ' . $e->getMessage());
+        return redirect()->route('admin.projects')->with('error', 'Projet introuvable ou problème de base de données.');
+    }
     $validated = $request->validate([
         'title' => 'required|string|max:255',
         'description' => 'nullable|string',
@@ -74,32 +100,52 @@ public function update(Request $request, $id)
     } else {
         $validated['image_path'] = $project->image_path;
     }
-    $project->update($validated);
-    return redirect()->route('admin.projects')->with('success', 'Projet mis à jour.');
+    try {
+        $project->update($validated);
+        return redirect()->route('admin.projects')->with('success', 'Projet mis à jour.');
+    } catch (QueryException $e) {
+        Log::error('Admin\\ProjectController@update QueryException (update): ' . $e->getMessage());
+        return redirect()->back()->withInput()->with('error', 'Impossible de mettre à jour le projet : problème de base de données.');
+    }
 }
 
     public function destroy($id)
     {
-        $project = Project::findOrFail($id);
-        $project->delete();
-        return redirect()->route('admin.projects')->with('success', 'Projet supprimé.');
+        try {
+            $project = Project::findOrFail($id);
+            $project->delete();
+            return redirect()->route('admin.projects')->with('success', 'Projet supprimé.');
+        } catch (QueryException $e) {
+            Log::error('Admin\\ProjectController@destroy QueryException: ' . $e->getMessage());
+            return redirect()->route('admin.projects')->with('error', 'Impossible de supprimer le projet : problème de base de données.');
+        }
     }
 
     public function show($id)
     {
-        $project = Project::findOrFail($id);
-        if (property_exists($project, 'is_read') && !$project->is_read) {
-            $project->is_read = true;
-            $project->save();
+        try {
+            $project = Project::findOrFail($id);
+            if (property_exists($project, 'is_read') && !$project->is_read) {
+                $project->is_read = true;
+                $project->save();
+            }
+            return view('admin.projects.show', compact('project'));
+        } catch (QueryException $e) {
+            Log::error('Admin\\ProjectController@show QueryException: ' . $e->getMessage());
+            return redirect()->route('admin.projects')->with('error', 'Projet introuvable ou problème de base de données.');
         }
-        return view('admin.projects.show', compact('project'));
     }
 
     public function toggle($id)
     {
-        $project = Project::findOrFail($id);
-        $project->is_active = !$project->is_active;
-        $project->save();
-        return redirect()->route('admin.projects')->with('success', 'Statut du projet modifié.');
+        try {
+            $project = Project::findOrFail($id);
+            $project->is_active = !$project->is_active;
+            $project->save();
+            return redirect()->route('admin.projects')->with('success', 'Statut du projet modifié.');
+        } catch (QueryException $e) {
+            Log::error('Admin\\ProjectController@toggle QueryException: ' . $e->getMessage());
+            return redirect()->route('admin.projects')->with('error', 'Impossible de modifier le statut : problème de base de données.');
+        }
     }
 }

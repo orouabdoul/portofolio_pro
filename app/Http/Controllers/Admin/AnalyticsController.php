@@ -4,20 +4,38 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Contact;
 use App\Models\Project;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Log;
 
 class AnalyticsController extends Controller
 {
     public function index()
     {
         $contactsCount = Contact::count();
-        $projectsCount = Project::count();
+        try {
+            $projectsCount = Project::count();
+        } catch (QueryException $e) {
+            Log::error('Admin\\AnalyticsController@index QueryException (count): ' . $e->getMessage());
+            $projectsCount = 0;
+        } catch (\Exception $e) {
+            Log::error('Admin\\AnalyticsController@index Exception (count): ' . $e->getMessage());
+            $projectsCount = 0;
+        }
 
 
         // Récupère les 6 dernières dates (toutes entités confondues)
-        $dates = collect([
-            ...Contact::orderBy('created_at','desc')->limit(6)->pluck('created_at')->toArray(),
-            ...Project::orderBy('created_at','desc')->limit(6)->pluck('created_at')->toArray(),
-        ])->sort()->unique()->take(6)->values();
+        try {
+            $dates = collect([
+                ...Contact::orderBy('created_at','desc')->limit(6)->pluck('created_at')->toArray(),
+                ...Project::orderBy('created_at','desc')->limit(6)->pluck('created_at')->toArray(),
+            ])->sort()->unique()->take(6)->values();
+        } catch (QueryException $e) {
+            Log::error('Admin\\AnalyticsController@index QueryException (dates): ' . $e->getMessage());
+            $dates = collect(Contact::orderBy('created_at','desc')->limit(6)->pluck('created_at')->toArray())->sort()->unique()->take(6)->values();
+        } catch (\Exception $e) {
+            Log::error('Admin\\AnalyticsController@index Exception (dates): ' . $e->getMessage());
+            $dates = collect(Contact::orderBy('created_at','desc')->limit(6)->pluck('created_at')->toArray())->sort()->unique()->take(6)->values();
+        }
 
         // Format labels
         $labels = $dates->map(function($date) {
@@ -32,7 +50,15 @@ class AnalyticsController extends Controller
         // Evolution projets
         $projectsEvolution = [];
         foreach ($dates as $date) {
-            $projectsEvolution[] = Project::where('created_at', '<=', $date)->count();
+            try {
+                $projectsEvolution[] = Project::where('created_at', '<=', $date)->count();
+            } catch (QueryException $e) {
+                Log::error('Admin\\AnalyticsController@index QueryException (evolution): ' . $e->getMessage());
+                $projectsEvolution[] = 0;
+            } catch (\Exception $e) {
+                Log::error('Admin\\AnalyticsController@index Exception (evolution): ' . $e->getMessage());
+                $projectsEvolution[] = 0;
+            }
         }
 
 
