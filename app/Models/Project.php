@@ -26,4 +26,25 @@ class Project extends Model
     {
         return $this->belongsTo(Category::class, 'category_id');
     }
+
+    /**
+     * Accessor: get technologies as array
+     */
+    public function getTechnologiesAttribute($value)
+    {
+        if (is_array($value)) return $value;
+        return $value ? explode(',', $value) : [];
+    }
+
+    /**
+     * Mutator: set technologies from array to CSV
+     */
+    public function setTechnologiesAttribute($value)
+    {
+        if (is_array($value)) {
+            $this->attributes['technologies'] = implode(',', $value);
+        } else {
+            $this->attributes['technologies'] = $value;
+        }
+    }
 }

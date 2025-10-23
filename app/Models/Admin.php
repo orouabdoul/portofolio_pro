@@ -7,5 +7,6 @@ class Admin extends Model
 {
     protected $table = 'admins';
     protected $fillable = ['email', 'password'];
-    public $timestamps = false;
+    // Admin table includes timestamps in migration; allow Eloquent to manage them
+    public $timestamps = true;
 }
