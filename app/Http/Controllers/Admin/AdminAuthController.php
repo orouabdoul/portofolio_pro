@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Admin;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Log;
 
 class AdminAuthController extends Controller
 {
@@ -20,7 +22,16 @@ class AdminAuthController extends Controller
             'email' => 'required|email',
             'password' => 'required',
         ]);
-        $admin = Admin::where('email', $request->email)->first();
+        try {
+            $admin = Admin::where('email', $request->email)->first();
+        } catch (QueryException $e) {
+            Log::error('AdminAuthController@login QueryException: ' . $e->getMessage());
+            return back()->with('error', 'Problème de base de données. Veuillez réessayer plus tard.');
+        } catch (\Exception $e) {
+            Log::error('AdminAuthController@login Exception: ' . $e->getMessage());
+            return back()->with('error', 'Erreur inconnue. Veuillez réessayer.');
+        }
+
         if ($admin && \Illuminate\Support\Facades\Hash::check($request->password, $admin->password)) {
             Session::put('is_admin', true);
             return redirect('/admin/dashboard');
