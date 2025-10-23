@@ -23,7 +23,12 @@ class HomeController extends Controller
         $query = \App\Models\Project::where('is_active', true)->orderBy('created_at', 'desc');
 
         if ($category && $category !== 'Tous') {
-            $query->where('category', $category);
+            // support either 'category_id' (numeric) or 'category' (name)
+            if (is_numeric($category)) {
+                $query->where('category_id', (int) $category);
+            } else {
+                $query->where('category', $category);
+            }
         }
 
         $projects = $query->get();
