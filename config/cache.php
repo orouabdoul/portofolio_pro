@@ -15,7 +15,11 @@ return [
     |
     */
 
-    'default' => env('CACHE_STORE', 'database'),
+    // Force the file cache driver by default to avoid QueryException when the
+    // database-backed cache table is not present (common with sqlite in
+    // ephemeral containers). If you want a DB cache, set up the cache table
+    // and change this value in your environment/config.
+    'default' => 'file',
 
     /*
     |--------------------------------------------------------------------------
