@@ -23,7 +23,7 @@
             <div class="card text-center shadow border-0" style="background: linear-gradient(90deg, #6366f1 0%, #a78bfa 100%);">
                 <div class="card-body text-white">
                     <div class="mb-2"><i class="fas fa-project-diagram fa-2x text-white"></i></div>
-                    <div class="fw-bold h4 mb-0">{{ $projects->total() }}</div>
+                    <div class="fw-bold h4 mb-0">{{ $projects->total() ?? 0 }}</div>
                     <div class="text-white">Total</div>
                 </div>
             </div>

@@ -47,4 +47,18 @@ class Project extends Model
             $this->attributes['technologies'] = $value;
         }
     }
+
+    /**
+     * Accessor: full publicly-accessible image URL or placeholder
+     */
+    public function getImageUrlAttribute()
+    {
+        if (!empty($this->image_path)) {
+            $full = public_path('storage/' . $this->image_path);
+            if (file_exists($full)) {
+                return asset('storage/' . $this->image_path);
+            }
+        }
+        return 'https://via.placeholder.com/368x242/6366f1/a78bfa?text=Projet';
+    }
 }

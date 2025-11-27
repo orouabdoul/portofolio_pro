@@ -26,13 +26,13 @@
         <div class="carousel-item active">
           <div class="testimonial-card text-center text-white rounded-4 p-5 mx-auto" style="max-width:720px;">
             <div class="mb-4">
-              <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Sarah" class="rounded-circle shadow" style="width:90px; height:90px; object-fit:cover; border:3px solid #38bdf8;">
+              <img src="{{ asset('storage/images/omar.png') }}" alt="Omar" class="rounded-circle shadow" style="width:90px; height:90px; object-fit:cover; border:3px solid #38bdf8;">
             </div>
             <blockquote class="testimonial-quote mx-auto mb-4">
-              “Un accompagnement exceptionnel, une app livrée en avance et un design qui fait l’unanimité !”
+              "Amadou a apporté professionnalisme, précision et rapidité, offrant une collaboration fluide et un résultat frontend/UX qui a propulsé notre projet."
             </blockquote>
-            <h5 class="fw-bold text-info mb-0">Sarah</h5>
-            <small class="text-white-50">Fondatrice de StartupX</small>
+            <h5 class="fw-bold text-info mb-0">Omar Faruk</h5>
+            <small class="text-white-50">Paid ads |GA4 | CRO</small>
           </div>
         </div>
 

@@ -130,34 +130,38 @@
 <script>
     // Chart.js - Répartition des messages lus/non lus
     document.addEventListener('DOMContentLoaded', function() {
-        const ctx = document.getElementById('messagesChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Lus', 'Non lus'],
-                datasets: [{
-                    data: [{{ $messages->where('is_read', true)->count() ?? 0 }}, {{ $messages->where('is_read', false)->count() ?? 0 }}],
-                    backgroundColor: ['#10b981', '#f59e42'],
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                plugins: {
-                    legend: { display: true, position: 'bottom' }
+        const ctx = document.getElementById('messagesChart')?.getContext ? document.getElementById('messagesChart').getContext('2d') : null;
+        if (ctx) {
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Lus', 'Non lus'],
+                    datasets: [{
+                        data: [{{ $messages->where('is_read', true)->count() ?? 0 }}, {{ $messages->where('is_read', false)->count() ?? 0 }}],
+                        backgroundColor: ['#10b981', '#f59e42'],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    plugins: {
+                        legend: { display: true, position: 'bottom' }
+                    }
                 }
-            }
-        });
+            });
+        }
     });
 </script>
 <script>
     // Simulation notification temps réel
     setTimeout(function() {
         const notif = document.getElementById('realtime-notif');
-        notif.style.display = 'flex';
-        document.getElementById('notif-message').textContent = 'Nouveau message reçu !';
-        setTimeout(function() {
-            notif.style.display = 'none';
-        }, 5000);
+        if (notif) {
+            notif.style.display = 'flex';
+            document.getElementById('notif-message').textContent = 'Nouveau message reçu !';
+            setTimeout(function() {
+                notif.style.display = 'none';
+            }, 5000);
+        }
     }, 3000);
 
     // AJAX pour marquer comme lu
@@ -168,11 +172,14 @@
                 var id = this.getAttribute('data-id');
                 var row = this.closest('tr');
                 var href = this.getAttribute('href');
-                // Mise à jour immédiate du badge
-                var badge = row.querySelector('span.badge');
-                badge.classList.remove('bg-warning', 'text-dark');
-                badge.classList.add('bg-success');
-                badge.textContent = 'Lu';
+                if(row){
+                    var badge = row.querySelector('span.badge');
+                    if(badge){
+                        badge.classList.remove('bg-warning', 'text-dark');
+                        badge.classList.add('bg-success');
+                        badge.textContent = 'Lu';
+                    }
+                }
                 // AJAX pour marquer comme lu
                 fetch('/admin/messages/' + id + '/mark-read', {
                     method: 'POST',

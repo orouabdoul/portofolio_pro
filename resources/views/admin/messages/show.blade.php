@@ -1,4 +1,3 @@
-
 @extends('admin.layout')
 
 @section('title', 'Message de ' . $message->name)
