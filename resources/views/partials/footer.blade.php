@@ -19,10 +19,10 @@
       <div class="d-flex gap-3 align-items-center">
         <a href="https://www.linkedin.com/" class="text-info" target="_blank" rel="noopener" title="LinkedIn"><i class="bi bi-linkedin" style="font-size: 1.5rem;"></i></a>
         <a href="https://github.com/" class="text-info" target="_blank" rel="noopener" title="GitHub"><i class="bi bi-github" style="font-size: 1.5rem;"></i></a>
-        <a href="mailto:contact@email.com" class="text-info" title="Email"><i class="bi bi-envelope-fill" style="font-size: 1.5rem;"></i></a>
-        <a href="https://facebook.com/" class="text-info" target="_blank" rel="noopener" title="Facebook"><i class="bi bi-facebook" style="font-size: 1.5rem;"></i></a>
+        <a href="mailto:orouabdoulayeissia@gmail.com" class="text-info" title="Email"><i class="bi bi-envelope-fill" style="font-size: 1.5rem;"></i></a>
+        <a href="https://www.facebook.com/profile.php?id=61580646575283" class="text-info" target="_blank" rel="noopener" title="Facebook"><i class="bi bi-facebook" style="font-size: 1.5rem;"></i></a>
         <a href="https://twitter.com/" class="text-info" target="_blank" rel="noopener" title="Twitter"><i class="bi bi-twitter-x" style="font-size: 1.5rem;"></i></a>
-        <a href="https://wa.me/0000000000" class="text-info" target="_blank" rel="noopener" title="WhatsApp"><i class="bi bi-whatsapp" style="font-size: 1.5rem;"></i></a>
+        <a href="https://wa.me/22959000892" class="text-info" target="_blank" rel="noopener" title="WhatsApp"><i class="bi bi-whatsapp" style="font-size: 1.5rem;"></i></a>
         <a href="https://t.me/username" class="text-info" target="_blank" rel="noopener" title="Telegram"><i class="bi bi-telegram" style="font-size: 1.5rem;"></i></a>
         <a href="/admin/login" class="text-info text-decoration-underline small ms-2" style="opacity:0.7;">
           <i class="bi bi-shield-lock" style="opacity:0.3; margin-left: 5px;"></i>
